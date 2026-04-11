@@ -18,6 +18,7 @@ const envSchema = z.object({
   IMAGEKIT_PRIVATE_KEY: z.string(),
   IMAGEKIT_PUBLIC_KEY: z.string(),
   IMAGEKIT_URL_ENDPOINT: z.string(),
+  REPLICATE_API_TOKEN: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

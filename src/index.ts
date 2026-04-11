@@ -7,6 +7,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.js";
 import projectRouter from "./routes/project.js";
 import imagekitRouter from "./routes/imagekit.js";
+import aiRouter from "./routes/ai.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/imagekit", imagekitRouter);
+app.use("/api/ai", aiRouter);
 
 // Health check
 app.get("/", (_req, res) => {
