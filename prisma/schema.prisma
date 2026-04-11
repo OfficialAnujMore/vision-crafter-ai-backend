@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  googleId  String    @unique @map("google_id")
+  email     String    @unique
+  name      String
+  picture   String?
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  lastLogin DateTime  @default(now()) @map("last_login")
+
+  projects  Project[]
+
+  @@map("user")
+}
+
+enum FileType {
+  image
+  video
+}
+
+model Project {
+  id           Int      @id @default(autoincrement())
+  fileId       String   @map("file_id")
+  userId       Int      @map("user_id")
+  title        String
+  projectUrl   String   @map("project_url")
+  thumbnailUrl String   @map("thumbnail_url")
+  width        Int
+  height       Int
+  fileType     FileType @map("file_type")
+  canvasState  String?  @map("canvas_state")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("projects")
+}
