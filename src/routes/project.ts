@@ -12,7 +12,7 @@ const router = Router();
 router.use(requireAuth);
 
 function serializeProject(project: {
-  id: number;
+  id: string;
   fileId: string;
   userId: number;
   title: string;
@@ -97,7 +97,7 @@ router.post("/create", async (req: Request, res: Response) => {
 // GET /api/projects/:projectId
 router.get("/:projectId", async (req: Request, res: Response) => {
   const currentUserId = parseInt(req.user!.sub as string);
-  const projectId = parseInt(getParam(req.params.projectId));
+  const projectId = getParam(req.params.projectId);
 
   const project = await prisma.project.findUnique({
     where: { id: projectId },
@@ -155,7 +155,7 @@ router.get("/user/:userId", async (req: Request, res: Response) => {
 // Shared update logic for PUT and PATCH
 async function handleUpdate(req: Request, res: Response) {
   const currentUserId = parseInt(req.user!.sub as string);
-  const projectId = parseInt(getParam(req.params.projectId));
+  const projectId = getParam(req.params.projectId);
 
   const project = await prisma.project.findUnique({
     where: { id: projectId },

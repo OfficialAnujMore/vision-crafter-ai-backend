@@ -28,7 +28,7 @@ enum FileType {
 }
 
 model Project {
-  id           Int      @id @default(autoincrement())
+  id           String   @id @default(uuid()) @db.Uuid
   fileId       String   @map("file_id")
   userId       Int      @map("user_id")
   title        String
