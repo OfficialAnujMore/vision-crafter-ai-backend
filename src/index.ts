@@ -8,8 +8,17 @@ import authRouter from "./routes/auth.js";
 import projectRouter from "./routes/project.js";
 import imagekitRouter from "./routes/imagekit.js";
 import aiRouter from "./routes/ai.js";
+import paymentsRouter from "./routes/payments.js";
+import stripeWebhookRouter from "./routes/stripeWebhook.js";
 
 const app = express();
+
+// Stripe webhook must receive raw body — mount before express.json()
+app.use(
+  "/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhookRouter
+);
 
 // Middleware
 app.use(
@@ -28,6 +37,7 @@ app.use("/auth", authRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/imagekit", imagekitRouter);
 app.use("/api/ai", aiRouter);
+app.use("/api/payments", paymentsRouter);
 
 // Health check
 app.get("/", (_req, res) => {

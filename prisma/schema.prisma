@@ -17,9 +17,67 @@ model User {
   createdAt DateTime  @default(now()) @map("created_at")
   lastLogin DateTime  @default(now()) @map("last_login")
 
-  projects  Project[]
+  projects     Project[]
+  tokenBalance TokenBalance?
+  purchases    Purchase[]
+  transactions TokenTransaction[]
 
   @@map("user")
+}
+
+model TokenBalance {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  balance   Int      @default(50)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("token_balance")
+}
+
+enum PurchaseStatus {
+  pending
+  completed
+  failed
+}
+
+model Purchase {
+  id              String         @id @default(uuid()) @db.Uuid
+  userId          Int            @map("user_id")
+  stripeSessionId String         @unique @map("stripe_session_id")
+  stripePriceId   String         @map("stripe_price_id")
+  amountCents     Int            @map("amount_cents")
+  tokensGranted   Int            @map("tokens_granted")
+  status          PurchaseStatus @default(pending)
+  createdAt       DateTime       @default(now()) @map("created_at")
+  fulfilledAt     DateTime?      @map("fulfilled_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("purchases")
+}
+
+enum TransactionType {
+  credit
+  debit
+}
+
+model TokenTransaction {
+  id           Int             @id @default(autoincrement())
+  userId       Int             @map("user_id")
+  type         TransactionType
+  amount       Int
+  action       String?
+  purchaseId   String?         @map("purchase_id") @db.Uuid
+  balanceAfter Int             @map("balance_after")
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("token_transactions")
 }
 
 enum FileType {

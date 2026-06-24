@@ -6,6 +6,7 @@ import {
   verifyGoogleToken,
   verifyTokenType,
 } from "../utils/security.js";
+import { initializeTokenBalance } from "../services/tokenService.js";
 
 const router = Router();
 
@@ -53,6 +54,7 @@ router.post("/google", async (req: Request, res: Response) => {
           isActive: true,
         },
       });
+      await initializeTokenBalance(user.id);
     }
 
     const accessToken = createAccessToken(user.id, 15);

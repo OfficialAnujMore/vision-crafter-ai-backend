@@ -19,6 +19,9 @@ const envSchema = z.object({
   IMAGEKIT_PUBLIC_KEY: z.string(),
   IMAGEKIT_URL_ENDPOINT: z.string(),
   REPLICATE_API_TOKEN: z.string(),
+  STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
+  FRONTEND_URL: z.string().default("http://localhost:5173"),
 });
 
 export const env = envSchema.parse(process.env);
