@@ -6,7 +6,7 @@ import { prisma } from "./config/db.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./routes/auth.js";
 import projectRouter from "./routes/project.js";
-import imagekitRouter from "./routes/imagekit.js";
+import storageRouter from "./routes/storage.js";
 import aiRouter from "./routes/ai.js";
 import paymentsRouter from "./routes/payments.js";
 import stripeWebhookRouter from "./routes/stripeWebhook.js";
@@ -35,7 +35,7 @@ app.use(cookieParser());
 // Routes
 app.use("/auth", authRouter);
 app.use("/api/projects", projectRouter);
-app.use("/api/imagekit", imagekitRouter);
+app.use("/api/storage", storageRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/payments", paymentsRouter);
 

@@ -7,7 +7,7 @@
 - **Prisma 7** ORM with PostgreSQL driver adapter (`@prisma/adapter-pg`)
 - **Local PostgreSQL** database
 - **jsonwebtoken** for JWT auth
-- **@imagekit/nodejs** for ImageKit upload auth
+- **@aws-sdk/client-s3** + **s3-request-presigner** for S3 blob storage (presigned uploads)
 - **Zod** for environment validation
 
 ## Commands
@@ -33,13 +33,13 @@ src/
 ├── routes/
 │   ├── auth.ts           # Google OAuth, JWT cookies, refresh, logout
 │   ├── project.ts        # Project CRUD with ownership checks
-│   └── imagekit.ts       # ImageKit upload auth endpoint
+│   └── storage.ts        # Presigned S3 upload URL endpoint
 ├── middleware/
 │   ├── auth.ts           # requireAuth middleware (cookie-based JWT)
 │   └── errorHandler.ts   # Global error handler
 ├── utils/
 │   ├── security.ts       # JWT create/verify, Google token verification
-│   └── imagekit.ts       # ImageKit API (file details, rename, delete)
+│   └── s3.ts             # S3 API (presigned upload URLs, delete, public URLs)
 └── generated/prisma/     # Auto-generated Prisma client (gitignored)
 
 prisma/
@@ -61,10 +61,10 @@ Same contract as the FastAPI backend — frontend needs zero changes.
 - `GET /api/projects/user/:userId` — List user's projects
 - `PUT /api/projects/:projectId` — Full update
 - `PATCH /api/projects/:projectId` — Partial update
-- `DELETE /api/projects/:fileId` — Delete project + ImageKit file
+- `DELETE /api/projects/:fileId` — Delete project + S3 object (fileId = S3 key)
 
-### ImageKit (`/api/imagekit`)
-- `GET /api/imagekit/auth` — Upload auth params (token, signature, expire)
+### Storage (`/api/storage`)
+- `POST /api/storage/presign` — Presigned S3 PUT URL. Body `{ fileName, contentType, key? }`; pass `key` to overwrite an owned object (autosave). Returns `{ upload_url, key, public_url }`. See `docs/AWS_S3_SETUP.md`.
 
 ### Health
 - `GET /` — `{ service, status }`

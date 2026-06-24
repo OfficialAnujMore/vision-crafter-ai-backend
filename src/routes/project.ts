@@ -1,10 +1,7 @@
 import { Router, Request, Response } from "express";
 import { prisma } from "../config/db.js";
 import { requireAuth } from "../middleware/auth.js";
-import {
-  deleteImageFromImageKit,
-  renameImageInImageKit,
-} from "../utils/imagekit.js";
+import { deleteObject } from "../utils/s3.js";
 
 const router = Router();
 
@@ -183,16 +180,6 @@ async function handleUpdate(req: Request, res: Response) {
   const body = req.body;
 
   if (body.title !== undefined && body.title !== null) {
-    if (body.title !== project.title) {
-      const imagekitDetails = await renameImageInImageKit(
-        project.fileId,
-        body.title
-      );
-      updateData.projectUrl =
-        (imagekitDetails.url as string) ?? project.projectUrl;
-      updateData.thumbnailUrl =
-        (imagekitDetails.thumbnail as string) ?? project.thumbnailUrl;
-    }
     updateData.title = body.title;
   }
   if (body.project_url !== undefined && body.project_url !== null) {
@@ -243,19 +230,18 @@ router.put("/:projectId", handleUpdate);
 // PATCH /api/projects/:projectId
 router.patch("/:projectId", handleUpdate);
 
-// DELETE /api/projects/:fileId
-router.delete("/:fileId", async (req: Request, res: Response) => {
+router.delete("/:projectId", async (req: Request, res: Response) => {
   const currentUserId = parseInt(req.user!.sub as string);
-  const fileId = getParam(req.params.fileId);
+  const projectId = getParam(req.params.projectId);
 
-  const project = await prisma.project.findFirst({
-    where: { fileId },
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
   });
 
   if (!project) {
     res.status(404).json({
       success: false,
-      message: `Project with file_id ${fileId} not found`,
+      message: `Project with id ${projectId} not found`,
       statusCode: 404,
     });
     return;
@@ -271,10 +257,10 @@ router.delete("/:fileId", async (req: Request, res: Response) => {
   }
 
   try {
-    await deleteImageFromImageKit(fileId);
+    await deleteObject(project.fileId);
 
-    await prisma.project.deleteMany({
-      where: { fileId },
+    await prisma.project.delete({
+      where: { id: projectId },
     });
 
     res.status(204).send();
