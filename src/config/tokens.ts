@@ -2,6 +2,7 @@ export const TOKEN_COSTS = {
   background_removal: 2,
   image_extension: 5,
   ai_image_generation: 4,
+  ai_image_edit: 4,
   smart_object_removal: 3,
 } as const;
 
